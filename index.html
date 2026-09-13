@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <link rel = "stylesheet" href = "style.css"/>
+  <title>Title</title>
+</head>
+<body>
+
+<div id="header">
+  <span>Выполнил: Погорельченко Фёдор</span>
+  <span>Группа: P3212</span>
+  <span>Вариант: 12694</span>
+</div>
+
+<div class="panel">
+  <canvas id="canvas" width="800" height="600"></canvas>
+</div>
+
+<div class="panel">
+  <form id="pointForm">
+  <div>
+    <label>X:</label>
+    <input type="checkbox" id="x-3" value="-3" name="x">
+    <label for="x-3">-3</label>
+    <input type="checkbox" id="x-2" value="-2" name="x">
+    <label for="x-2">-2</label>
+    <input type="checkbox" id="x-1" value="-1" name="x">
+    <label for="x-1">-1</label>
+    <input type="checkbox" id="x0" value="0" name="x">
+    <label for="x0">0</label>
+    <input type="checkbox" id="x1" value="1" name="x">
+    <label for="x1">1</label>
+    <input type="checkbox" id="x2" value="2" name="x">
+    <label for="x2">2</label>
+    <input type="checkbox" id="x3" value="3" name="x">
+    <label for="x3">3</label>
+    <input type="checkbox" id="x4" value="4" name="x">
+    <label for="x4">4</label>
+    <input type="checkbox" id="x5" value="5" name="x">
+    <label for="x5">5</label>
+  </div>
+  <div>
+    <label for="y">Y:</label>
+    <input id="y" type="text" name="y" placeholder="от -3 до 5">
+  </div>
+  <div>
+    <label>R:</label>
+    <select id="r" name="r">
+      <option value="1">1</option>
+      <option value="1.5">1.5</option>
+      <option value="2">2</option>
+      <option value="2.5">2.5</option>
+      <option value="3">3</option>
+    </select>
+  </div>
+  <div>
+    <button type="submit">Отправить форму</button>
+  </div>
+</form>
+</div>
+<div class="panel">
+<table id="resultTable">
+  <caption>
+    Таблица результатов
+  </caption>
+  <thead>
+  <tr>
+    <th>X</th>
+    <th>Y</th>
+    <th>R</th>
+    <th>Результат попадания</th>
+    <th>Дата и время</th>
+  </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
