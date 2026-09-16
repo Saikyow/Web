@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <link rel = "stylesheet" href = "style.css"/>
+  <link href="style.css" rel="stylesheet"/>
   <title>Title</title>
 </head>
 <body>
@@ -13,11 +13,14 @@
   <span>Вариант: 12694</span>
 </div>
 
-<div class="panel">
-  <canvas id="canvas" width="800" height="600"></canvas>
+
+<div class="graph-from-container">
+
+<div class="panel graph-panel">
+  <canvas id="canvas"></canvas>
 </div>
 
-<div class="panel">
+<div class="panel form-panel">
   <form id="pointForm">
   <div>
     <label>X:</label>
@@ -45,7 +48,7 @@
     <input id="y" type="text" name="y" placeholder="от -3 до 5">
   </div>
   <div>
-    <label>R:</label>
+    <label for="r">R:</label>
     <select id="r" name="r">
       <option value="1">1</option>
       <option value="1.5">1.5</option>
@@ -59,7 +62,9 @@
   </div>
 </form>
 </div>
-<div class="panel">
+
+</div>
+<div class="panel" id="result">
 <table id="resultTable">
   <caption>
     Таблица результатов
