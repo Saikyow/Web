@@ -1,12 +1,86 @@
 const canvas = document.getElementById("canvas")
 
+const xCheckboxes = document.querySelectorAll('input[name="x"]')
+const selectedR = document.getElementById("r");
+const form = document.getElementById('pointForm');
+const tableBody = document.querySelector('#resultTable tbody');
+
 const ctx = canvas.getContext("2d")
 
-const xEnd = canvas.width;
-const yCenter = canvas.height / 2;
-const xCenter = canvas.width / 2;
-const unitScale = 50;
+let xEnd;
+let yCenter;
+let xCenter;
+let unitScale;
 
+function resizeCanvas() {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
+  xEnd = canvas.width;
+  yCenter = canvas.height / 2;
+  xCenter = canvas.width / 2;
+
+  unitScale = Math.min(canvas.width, canvas.height) / 12;
+
+  const r = Number(selectedR.value);
+
+  drawGraph(r);
+  drawSavedPoints(r);
+}
+
+function saveResult(result){
+  addResultToTable(result);
+  const savedResults = localStorage.getItem("results");
+  const results = savedResults ? JSON.parse(savedResults) : [];
+  results.push(result);
+  localStorage.setItem("results", JSON.stringify(results));
+}
+
+function checkHit(x, y, r){
+  const inRectangle =
+    x >= 0 &&
+    x <= r &&
+    y >= -r &&
+    y <= 0;
+
+  const inCircle =
+    x <= 0 &&
+    y <= 0 &&
+    x * x + y * y <= (r / 2) * (r / 2);
+
+  const inTriangle =
+    x >= -r/2 &&
+    x <= 0 &&
+    y >= 0 &&
+    y <= 2 * x + r
+
+  return inCircle || inRectangle || inTriangle;
+}
+
+function clickCanvas(click){
+  const rect = canvas.getBoundingClientRect();
+
+  const canvasX = click.clientX - rect.left;
+  const canvasY = click.clientY - rect.top;
+
+  const graphX = (canvasX - xCenter) / unitScale;
+  const graphY = (yCenter - canvasY) / unitScale;
+
+  const r = Number(selectedR.value);
+
+  const hit = checkHit(graphX, graphY, r);
+
+  drawPoint(canvasX, canvasY, hit);
+
+  const result = {
+    x: graphX,
+    y: graphY,
+    r,
+    hit,
+    timestamp: Date.now()
+  };
+  saveResult(result);
+}
 
 // Отрисовка
 function drawGraph(r){
@@ -116,14 +190,6 @@ function drawGraph(r){
 
 }
 
-
-//Проверка checkbox
-
-const xCheckboxes = document.querySelectorAll('input[name="x"]')
-const selectedR = document.getElementById("r");
-const form = document.getElementById('pointForm');
-const tableBody = document.querySelector('#resultTable tbody');
-
 xCheckboxes.forEach(checkbox => {
   checkbox.addEventListener("change", () => {
     if (checkbox.checked) {
@@ -214,63 +280,42 @@ form.addEventListener("submit", (event) =>{
     alert("Введите X");
     return;
   }
-  const x = Number(selectedX.value);
+  const graphX = Number(selectedX.value);
 
   if (yInput.value.trim() === "") {
     alert("Введите Y");
     return;
   }
 
-  const y = Number(yInput.value);
+  const graphY = Number(yInput.value);
 
-  if (Number.isNaN(y)){
+  if (Number.isNaN(graphY)){
     alert("Y должен быть числом");
     return;
   }
 
-  if (y < -3 || y > 5){
+  if (graphY < -3 || graphY > 5){
     alert("Y должен быть в диапазоне от -3 до 5");
     return;
   }
 
   const r = Number(selectedR.value);
-  const pointX = xCenter + x * unitScale;
-  const pointY = yCenter - y * unitScale;
+  const pointX = xCenter + graphX * unitScale;
+  const pointY = yCenter - graphY * unitScale;
 
-  const inRectangle =
-    x >= 0 &&
-    x <= r &&
-    y >= -r &&
-    y <= 0;
-
-  const inCircle =
-    x <= 0 &&
-    y <= 0 &&
-    x * x + y * y <= (r / 2) * (r / 2);
-
-  const inTriangle =
-    x >= -r/2 &&
-    x <= 0 &&
-    y >= 0 &&
-    y <= 2 * x + r
-
-  const hit = inCircle || inTriangle || inRectangle;
+  const hit = checkHit(graphX, graphY, r);
 
   drawPoint(pointX, pointY, hit);
 
   const result = {
-    x,
-    y,
+    x: graphX,
+    y: graphY,
     r,
     hit,
     timestamp: Date.now()
   };
-  addResultToTable(result);
 
-  const savedResults = localStorage.getItem("results");
-  const results = savedResults ? JSON.parse(savedResults) : [];
-  results.push(result);
-  localStorage.setItem("results", JSON.stringify(results));
+  saveResult(result);
 });
 
 selectedR.addEventListener("change", () => {
@@ -280,8 +325,12 @@ selectedR.addEventListener("change", () => {
   drawSavedPoints(r);
 });
 
-drawGraph(Number(selectedR.value));
+window.addEventListener("resize", resizeCanvas);
+
+canvas.addEventListener("click", clickCanvas);
+
+resizeCanvas();
 loadResults();
-drawSavedPoints(Number(selectedR.value));
+
 
 
