@@ -2,6 +2,9 @@
     font-family: sans-serif;
     font-size: 18px;
     color: coral;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 6px 8px;
 }
 #header::before {
     content: "\2603";
@@ -16,6 +19,7 @@ span {
 }
 body {
     font-family: sans-serif;
+    background-color: wheat;
 }
 input[type="text"]{
     font-family: sans-serif;
@@ -79,4 +83,24 @@ input::placeholder{
 
 #pointForm > div {
     margin-bottom: 10px;
+}
+
+canvas {
+    width: 60%;
+    max-width: 500px;
+    aspect-ratio: 4/3;
+    display: flex;
+}
+
+.graph-from-container{
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+}
+.graph-panel {
+    cursor: pointer;
+    flex: 2;
+}
+.form-panel {
+    flex: 1
 }
