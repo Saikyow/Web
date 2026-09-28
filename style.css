@@ -9,7 +9,7 @@
 #header::before {
     content: "\2603";
 }
-span {
+#header span {
     font-size: 16px;
 }
 #header span{
@@ -20,17 +20,6 @@ span {
 body {
     font-family: sans-serif;
     background-color: wheat;
-}
-input[type="text"]{
-    font-family: sans-serif;
-    padding: 6px 8px;
-    border: 1px solid #999;
-    border-radius: 5px;
-    width: 140px;
-}
-
-input[type="text"]:focus{
-    outline: 2px solid #777;
 }
 
 input[type="checkbox"]{
@@ -51,27 +40,11 @@ input[type="checkbox"]:checked + label {
     font-weight: bold;
 }
 
-button[type="submit"]{
-    margin: 5px;
-    padding: 8px 14px;
-    border: 1px solid #555;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-button[type="submit"]:hover{
-    opacity: 0.8;
-}
-
 select[name="r"]{
     padding: 6px 8px;
     margin: 5px;
     border: 1px solid #999;
     border-radius: 5px;
-}
-input::placeholder{
-    color: grey;
-    opacity: 0.7;
 }
 
 .panel {
@@ -104,3 +77,57 @@ canvas {
 .form-panel {
     flex: 1
 }
+.point-form__error {
+    color: red;
+    font-size: 14px;
+    margin: 4px 0 0;
+    min-height: 18px;
+}
+.results__scroll {
+    max-height: 300px;
+    overflow: auto;
+}
+.results__table {
+    width: 100%;
+}
+.results__caption {
+    padding: 10px;
+    font-weight: bold;
+}
+.results__heading, .results__cell {
+    padding: 10px 14px;
+    border-bottom: 1px solid black;
+    text-align: center;
+}
+.results__heading {
+    position: sticky;
+    top: 0;
+    background-color: wheat;
+}
+.results__cell {
+    background-color: white;
+}
+.point-form__field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input__control::placeholder{
+    color: grey;
+    opacity: 0.7;
+}
+.point-form__submit, .point-form__y {
+    border: 1px solid black;
+    border-radius: 6px;
+    background: transparent;
+}
+.point-form__submit::before, .point-form__y::before {
+    border: none;
+    border-radius: 5px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
