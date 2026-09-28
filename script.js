@@ -4,6 +4,9 @@ const xCheckboxes = document.querySelectorAll('input[name="x"]')
 const selectedR = document.getElementById("r");
 const form = document.getElementById('pointForm');
 const tableBody = document.querySelector('#resultTable tbody');
+const xError = document.getElementById("xError")
+const yError = document.getElementById("yError")
+const clearResultsButton = document.getElementById("clearResults")
 
 const ctx = canvas.getContext("2d")
 
@@ -81,7 +84,6 @@ function clickCanvas(click){
   };
   saveResult(result);
 }
-
 // Отрисовка
 function drawGraph(r){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -235,6 +237,10 @@ function addResultToTable(result) {
   const dateCell = row.insertCell();
   dateCell.textContent = formattedDate;
 
+  for (const cell of row.cells){
+    cell.classList.add("results__cell")
+  }
+
   tableBody.appendChild(row);
 }
 
@@ -270,32 +276,75 @@ function drawSavedPoints(currentR){
   }
 }
 
+function clearResults() {
+  localStorage.removeItem('results');
+  tableBody.replaceChildren();
+
+  const r = Number(selectedR.value);
+  drawGraph(r);
+}
+
+function smartSelect(event) {
+  const isSelected = (event.metaKey || event.ctrlKey) && event.code === "KeyA" &&
+    !event.altKey && !event.shiftKey;
+
+  if (!isSelected) {
+    return;
+  }
+
+  const activeElement = document.activeElement;
+
+  if (
+    activeElement &&
+    activeElement.matches("input, textarea, select")
+  ){
+    return;
+  }
+
+  const table = document.getElementById("resultTable");
+  const selection = window.getSelection();
+
+  if (!selection || !table) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const range = document.createRange();
+  range.selectNodeContents(table);
+
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
 form.addEventListener("submit", (event) =>{
   event.preventDefault();
+  xError.textContent = "";
+  yError.textContent = "";
 
   const selectedX = document.querySelector('input[name="x"]:checked');
   const yInput = document.querySelector('input[name="y"]');
 
   if (selectedX === null ){
-    alert("Введите X");
+    xError.textContent = "Выберите X";
     return;
   }
   const graphX = Number(selectedX.value);
 
   if (yInput.value.trim() === "") {
-    alert("Введите Y");
+    yError.textContent = "Выберите Y";
     return;
   }
 
   const graphY = Number(yInput.value);
 
   if (Number.isNaN(graphY)){
-    alert("Y должен быть числом");
+    yError.textContent = "Y должно быть числом";
     return;
   }
 
   if (graphY < -3 || graphY > 5){
-    alert("Y должен быть в диапазоне от -3 до 5");
+    yError.textContent = "Y должен быть в диапазоне от -3 до 5";
     return;
   }
 
@@ -329,6 +378,8 @@ window.addEventListener("resize", resizeCanvas);
 
 canvas.addEventListener("click", clickCanvas);
 
+clearResultsButton.addEventListener("click", clearResults);
+document.addEventListener("keydown", smartSelect)
 resizeCanvas();
 loadResults();
 
