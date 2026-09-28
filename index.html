@@ -2,6 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <link
+    rel="stylesheet"
+    href="https://yastatic.net/bem-components/latest/desktop/bem-components.css"
+  >
   <link href="style.css" rel="stylesheet"/>
   <title>Title</title>
 </head>
@@ -21,7 +25,7 @@
 </div>
 
 <div class="panel form-panel">
-  <form id="pointForm">
+  <form id="pointForm" class="point-form">
   <div>
     <label>X:</label>
     <input type="checkbox" id="x-3" value="-3" name="x">
@@ -42,10 +46,25 @@
     <label for="x4">4</label>
     <input type="checkbox" id="x5" value="5" name="x">
     <label for="x5">5</label>
+    <p class="point-form__error" id="xError"></p>
   </div>
-  <div>
-    <label for="y">Y:</label>
-    <input id="y" type="text" name="y" placeholder="от -3 до 5">
+  <div class="point-form__field">
+    <label for="y">Y</label>
+    <span
+      class="input input_theme_islands input_size_m point-form__y i-bem"
+      data-bem='{"input":{}}'
+      >
+      <span class="input__box">
+        <input
+        class="input__control"
+        id="y"
+        type="text"
+        name="y"
+        placeholder="От -3 до 5"
+        >
+      </span>
+    </span>
+    <p class="point-form__error" id="yError"></p>
   </div>
   <div>
     <label for="r">R:</label>
@@ -58,30 +77,50 @@
     </select>
   </div>
   <div>
-    <button type="submit">Отправить форму</button>
+    <button
+      class="button button_theme_islands point-form__submit button_size_m button_type_submit button__control i-bem"
+      data-bem='{"button":{}}'
+      type="submit"
+    >
+    <span class="button__text">Отправить форму</span>
+    </button>
   </div>
 </form>
 </div>
 
 </div>
-<div class="panel" id="result">
-<table id="resultTable">
-  <caption>
-    Таблица результатов
-  </caption>
-  <thead>
-  <tr>
-    <th>X</th>
-    <th>Y</th>
-    <th>R</th>
-    <th>Результат попадания</th>
-    <th>Дата и время</th>
-  </tr>
-  </thead>
-  <tbody>
-  </tbody>
-</table>
+<div class="panel results" id="result">
+  <button
+    id="clearResults"
+    class="button button_theme_islands button_size_m button__control i-bem"
+    data-bem='{"button":{}}'
+    type="button"
+    >
+    <span class="button__text">
+      Очистить таблицу
+    </span>
+  </button>
+  <div class="results__scroll">
+    <table class="results__table" id="resultTable">
+      <caption class="results__caption">Таблица результатов</caption>
+
+      <thead>
+      <tr>
+        <th class="results__heading" scope="col">X</th>
+        <th class="results__heading" scope="col">Y</th>
+        <th class="results__heading" scope="col">R</th>
+        <th class="results__heading" scope="col">Результат попадания</th>
+        <th class="results__heading" scope="col">Дата и время</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+  </div>
+
 </div>
+
+<script src="https://yastatic.net/bem-components/latest/desktop/bem-components.js+bemhtml.js"></script>
 
 <script src="script.js"></script>
 </body>
