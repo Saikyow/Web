@@ -189,7 +189,32 @@ function drawGraph(r){
   ctx.lineTo(xCenter - 5, yCenter + scale);
   ctx.stroke();
 
+  drawAxisLabels(scale);
+}
 
+// В каждой четверти подписи только одной оси, чтобы они не слипались при малом R
+function drawAxisLabels(scale) {
+  const X_AXIS_LABEL_OFFSET = 24;
+  const Y_AXIS_LABEL_OFFSET = 22;
+  const labels = [
+    { text: "-R", ratio: -1 },
+    { text: "-R/2", ratio: -0.5 },
+    { text: "R/2", ratio: 0.5 },
+    { text: "R", ratio: 1 }
+  ];
+
+  ctx.save();
+  ctx.fillStyle = "black";
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  labels.forEach(({ text, ratio }) => {
+    ctx.fillText(text, xCenter + ratio * scale, yCenter - ratio * X_AXIS_LABEL_OFFSET);
+    ctx.fillText(text, xCenter - Math.sign(ratio) * Y_AXIS_LABEL_OFFSET, yCenter - ratio * scale);
+  });
+
+  ctx.restore();
 }
 
 xCheckboxes.forEach(checkbox => {
@@ -212,7 +237,6 @@ function drawPoint(pointX, pointY, hit) {
   }else {
     ctx.fillStyle = "red";
   }
-
   ctx.fill();
 }
 
@@ -255,11 +279,13 @@ function loadResults() {
   }
 }
 
-function drawResultPoint(result) {
+function drawResultPoint(result, currentR) {
   const pointX = xCenter + result.x * unitScale;
   const pointY = yCenter - result.y * unitScale;
 
-  drawPoint(pointX, pointY, result.hit);
+  const hit = checkHit(result.x, result.y, currentR);
+
+  drawPoint(pointX, pointY, hit);
 }
 
 function drawSavedPoints(currentR){
@@ -267,11 +293,8 @@ function drawSavedPoints(currentR){
 
   if (savedPoints){
     const results = JSON.parse(savedPoints);
-
     results.forEach(result => {
-      if (currentR === result.r){
-        drawResultPoint(result);
-      }
+      drawResultPoint(result, currentR);
     })
   }
 }
