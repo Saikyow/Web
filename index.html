@@ -2,10 +2,6 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <link
-    rel="stylesheet"
-    href="https://yastatic.net/bem-components/latest/desktop/bem-components.css"
-  >
   <link href="style.css" rel="stylesheet"/>
   <title>Title</title>
 </head>
@@ -50,20 +46,13 @@
   </div>
   <div class="point-form__field">
     <label for="y">Y</label>
-    <span
-      class="input input_theme_islands input_size_m point-form__y i-bem"
-      data-bem='{"input":{}}'
-      >
-      <span class="input__box">
-        <input
-        class="input__control"
-        id="y"
-        type="text"
-        name="y"
-        placeholder="От -3 до 5"
-        >
-      </span>
-    </span>
+    <input
+      class="point-form__y"
+      id="y"
+      type="text"
+      name="y"
+      placeholder="От -3 до 5"
+    >
     <p class="point-form__error" id="yError"></p>
   </div>
   <div>
@@ -78,11 +67,10 @@
   </div>
   <div>
     <button
-      class="button button_theme_islands point-form__submit button_size_m button_type_submit button__control i-bem"
-      data-bem='{"button":{}}'
+      class="point-form__submit"
       type="submit"
     >
-    <span class="button__text">Отправить форму</span>
+    Отправить форму
     </button>
   </div>
 </form>
@@ -92,13 +80,10 @@
 <div class="panel results" id="result">
   <button
     id="clearResults"
-    class="button button_theme_islands button_size_m button__control i-bem"
-    data-bem='{"button":{}}'
+    class="results__clear"
     type="button"
     >
-    <span class="button__text">
-      Очистить таблицу
-    </span>
+    Очистить таблицу
   </button>
   <div class="results__scroll">
     <table class="results__table" id="resultTable">
@@ -120,7 +105,6 @@
 
 </div>
 
-<script src="https://yastatic.net/bem-components/latest/desktop/bem-components.js+bemhtml.js"></script>
 
 <script src="script.js"></script>
 </body>
