@@ -58,13 +58,16 @@
   </div>
   <div>
     <label for="r">R:</label>
-    <select id="r" name="r">
-      <option value="1">1</option>
-      <option value="1.5">1.5</option>
-      <option value="2">2</option>
-      <option value="2.5">2.5</option>
-      <option value="3">3</option>
-    </select>
+    <input
+    id="r"
+    name="r"
+    type="text"
+    class="point-form__y"
+    maxlength="10"
+    value="3"
+    placeholder="(2, 5)">
+    <p class="point-form__error" id="rError"></p>
+
   </div>
   <div>
     <button

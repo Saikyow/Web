@@ -14,6 +14,7 @@ const xError = document.getElementById("xError")
 const yError = document.getElementById("yError")
 const serverError = document.getElementById("serverError")
 const clearResultsButton = document.getElementById("clearResults")
+const rError = document.getElementById("rError")
 
 const ctx = canvas.getContext("2d")
 
@@ -32,10 +33,7 @@ function resizeCanvas() {
 
   unitScale = Math.min(canvas.width, canvas.height) / 12;
 
-  const r = Number(selectedR.value);
-
-  drawGraph(r);
-  drawSavedPoints(r);
+  redrawGraph();
 }
 
 function loadSavedResults() {
@@ -301,6 +299,38 @@ function validateY(rawY) {
   return null;
 }
 
+function validateR(rawR) {
+  if (rawR === "") {
+    return "Введите R"
+  }
+  if (rawR.length > 10) {
+    return `R не длиннее 10 символов`;
+  }
+  if (!NUMBER_PATTERN.test(rawR)) {
+    return "R должен быть числом, например 3.5";
+  }
+
+  const r = Number(rawR);
+  if (r <= 2 || r >= 5) {
+    return "R должен быть в интервале (2; 5)";
+  }
+
+  return null;
+}
+
+function redrawGraph() {
+  const rawR = selectedR.value.trim().replace(",", ".");
+
+  if (validateR(rawR) !== null) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
+
+  const r = Number(rawR);
+  drawGraph(r);
+  drawSavedPoints(r);
+}
+
 async function sendPoint(x, y, r) {
   const query = new URLSearchParams({ x, y, r });
   const response = await fetch(`${SERVER_URL}?${query}`, { method: "GET" })
@@ -324,9 +354,17 @@ form.addEventListener("submit", async (event) =>{
   xError.textContent = "";
   yError.textContent = "";
   serverError.textContent = "";
+  rError.textContent = "";
 
   const selectedX = document.querySelector('input[name="x"]:checked');
   const yInput = document.querySelector('input[name="y"]');
+  const rawR = selectedR.value.trim().replace(",", ".");
+  const rErrorMessage = validateR(rawR);
+
+  if (rErrorMessage !== null) {
+    rError.textContent = rErrorMessage;
+    return;
+  }
 
   if (selectedX === null ){
     xError.textContent = "Выберите X";
@@ -341,27 +379,21 @@ form.addEventListener("submit", async (event) =>{
   }
 
   try {
-    const result = await sendPoint(selectedX.value, rawY, selectedR.value);
+    const result = await sendPoint(selectedX.value, rawY, rawR);
 
-    if (Number(result.r) === Number(selectedR.value)) {
-      drawResultPoint(result);
-    }
+    drawResultPoint(result);
     saveResult(result);
   } catch (error) {
     serverError.textContent = error.message;
   }
 });
 
-selectedR.addEventListener("change", () => {
-  const r = Number(selectedR.value);
-
-  drawGraph(r);
-  drawSavedPoints(r);
-});
+selectedR.addEventListener("input", redrawGraph);
 
 window.addEventListener("resize", resizeCanvas);
 
 clearResultsButton.addEventListener("click", clearResults);
 document.addEventListener("keydown", smartSelect)
+
 resizeCanvas();
 loadResults();
