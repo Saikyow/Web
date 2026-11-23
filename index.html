@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <link href="style.css" rel="stylesheet"/>
-  <title>Title</title>
+  <title>Лабораторная работа №2</title>
 </head>
 <body>
 
 <div id="header">
-  <span>Выполнил: Погорельченко Фёдор</span>
+  <span>Выполнил: Погорельченко Фёдор Федорович</span>
   <span>Группа: P3212</span>
   <span>Вариант: 12694</span>
 </div>
@@ -24,24 +24,24 @@
   <form id="pointForm" class="point-form">
   <div>
     <label>X:</label>
-    <input type="checkbox" id="x-3" value="-3" name="x">
+    <input type="radio" id="x-5" value="-5" name="x">
+    <label for="x-5">-5</label>
+    <input type="radio" id="x-4" value="-4" name="x">
+    <label for="x-4">-4</label>
+    <input type="radio" id="x-3" value="-3" name="x">
     <label for="x-3">-3</label>
-    <input type="checkbox" id="x-2" value="-2" name="x">
+    <input type="radio" id="x-2" value="-2" name="x">
     <label for="x-2">-2</label>
-    <input type="checkbox" id="x-1" value="-1" name="x">
+    <input type="radio" id="x-1" value="-1" name="x">
     <label for="x-1">-1</label>
-    <input type="checkbox" id="x0" value="0" name="x">
+    <input type="radio" id="x0" value="0" name="x">
     <label for="x0">0</label>
-    <input type="checkbox" id="x1" value="1" name="x">
+    <input type="radio" id="x1" value="1" name="x">
     <label for="x1">1</label>
-    <input type="checkbox" id="x2" value="2" name="x">
+    <input type="radio" id="x2" value="2" name="x">
     <label for="x2">2</label>
-    <input type="checkbox" id="x3" value="3" name="x">
+    <input type="radio" id="x3" value="3" name="x">
     <label for="x3">3</label>
-    <input type="checkbox" id="x4" value="4" name="x">
-    <label for="x4">4</label>
-    <input type="checkbox" id="x5" value="5" name="x">
-    <label for="x5">5</label>
     <p class="point-form__error" id="xError"></p>
   </div>
   <div class="point-form__field">
@@ -51,19 +51,23 @@
       id="y"
       type="text"
       name="y"
-      placeholder="От -3 до 5"
+      maxlength="10"
+      placeholder="От -3 до 5, не включая"
     >
     <p class="point-form__error" id="yError"></p>
   </div>
   <div>
     <label for="r">R:</label>
-    <select id="r" name="r">
-      <option value="1">1</option>
-      <option value="1.5">1.5</option>
-      <option value="2">2</option>
-      <option value="2.5">2.5</option>
-      <option value="3">3</option>
-    </select>
+    <input
+    id="r"
+    name="r"
+    type="text"
+    class="point-form__y"
+    maxlength="10"
+    value="3"
+    placeholder="(2, 5)">
+    <p class="point-form__error" id="rError"></p>
+
   </div>
   <div>
     <button
@@ -72,6 +76,7 @@
     >
     Отправить форму
     </button>
+    <p class="point-form__error" id="serverError"></p>
   </div>
 </form>
 </div>
@@ -95,7 +100,8 @@
         <th class="results__heading" scope="col">Y</th>
         <th class="results__heading" scope="col">R</th>
         <th class="results__heading" scope="col">Результат попадания</th>
-        <th class="results__heading" scope="col">Дата и время</th>
+        <th class="results__heading" scope="col">Текущее время</th>
+        <th class="results__heading" scope="col">Время выполнения</th>
       </tr>
       </thead>
       <tbody></tbody>

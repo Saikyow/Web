@@ -1,12 +1,20 @@
 const canvas = document.getElementById("canvas")
+const STORAGE_KEY = "lab2-504864";
+const SERVER_URL = "/fcgi-bin/server.jar";
 
-const xCheckboxes = document.querySelectorAll('input[name="x"]')
+const Y_MIN = -3;
+const Y_MAX = 5;
+const Y_MAX_LENGTH = 10;
+const NUMBER_PATTERN = /^-?\d+(\.\d+)?$/;
+
 const selectedR = document.getElementById("r");
 const form = document.getElementById('pointForm');
 const tableBody = document.querySelector('#resultTable tbody');
 const xError = document.getElementById("xError")
 const yError = document.getElementById("yError")
+const serverError = document.getElementById("serverError")
 const clearResultsButton = document.getElementById("clearResults")
+const rError = document.getElementById("rError")
 
 const ctx = canvas.getContext("2d")
 
@@ -25,65 +33,20 @@ function resizeCanvas() {
 
   unitScale = Math.min(canvas.width, canvas.height) / 12;
 
-  const r = Number(selectedR.value);
+  redrawGraph();
+}
 
-  drawGraph(r);
-  drawSavedPoints(r);
+function loadSavedResults() {
+  const savedResults = localStorage.getItem(STORAGE_KEY);
+  return savedResults ? JSON.parse(savedResults) : [];
 }
 
 function saveResult(result){
   addResultToTable(result);
-  const savedResults = localStorage.getItem("results");
-  const results = savedResults ? JSON.parse(savedResults) : [];
-  results.push(result);
-  localStorage.setItem("results", JSON.stringify(results));
+  const results = [...loadSavedResults(), result];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
 }
 
-function checkHit(x, y, r){
-  const inRectangle =
-    x >= 0 &&
-    x <= r &&
-    y >= -r &&
-    y <= 0;
-
-  const inCircle =
-    x <= 0 &&
-    y <= 0 &&
-    x * x + y * y <= (r / 2) * (r / 2);
-
-  const inTriangle =
-    x >= -r/2 &&
-    x <= 0 &&
-    y >= 0 &&
-    y <= 2 * x + r
-
-  return inCircle || inRectangle || inTriangle;
-}
-
-function clickCanvas(click){
-  const rect = canvas.getBoundingClientRect();
-
-  const canvasX = click.clientX - rect.left;
-  const canvasY = click.clientY - rect.top;
-
-  const graphX = (canvasX - xCenter) / unitScale;
-  const graphY = (yCenter - canvasY) / unitScale;
-
-  const r = Number(selectedR.value);
-
-  const hit = checkHit(graphX, graphY, r);
-
-  drawPoint(canvasX, canvasY, hit);
-
-  const result = {
-    x: graphX,
-    y: graphY,
-    r,
-    hit,
-    timestamp: Date.now()
-  };
-  saveResult(result);
-}
 // Отрисовка
 function drawGraph(r){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -104,18 +67,21 @@ function drawGraph(r){
 
   ctx.fillStyle = "#5c5cce"
 
-  ctx.fillRect(xCenter, yCenter, scale, scale);
+  // III четверть: прямоугольник от -R до 0 по X и от -R/2 до 0 по Y
+  ctx.fillRect(xCenter - scale, yCenter, scale, scale / 2);
 
+  // II четверть: треугольник (0,0), (-R/2,0), (0,R/2)
   ctx.beginPath();
-  ctx.moveTo(xCenter, yCenter - scale);
+  ctx.moveTo(xCenter, yCenter);
   ctx.lineTo(xCenter - scale / 2, yCenter);
-  ctx.lineTo(xCenter, yCenter);
+  ctx.lineTo(xCenter, yCenter - scale / 2);
   ctx.closePath();
   ctx.fill();
 
+  // IV четверть: четверть круга радиусом R/2 (на canvas ось Y направлена вниз)
   ctx.beginPath();
   ctx.moveTo(xCenter, yCenter);
-  ctx.arc( xCenter, yCenter, scale / 2, Math.PI / 2, Math.PI);
+  ctx.arc(xCenter, yCenter, scale / 2, 0, Math.PI / 2);
   ctx.closePath();
   ctx.fill();
 
@@ -192,7 +158,6 @@ function drawGraph(r){
   drawAxisLabels(scale);
 }
 
-// В каждой четверти подписи только одной оси, чтобы они не слипались при малом R
 function drawAxisLabels(scale) {
   const X_AXIS_LABEL_OFFSET = 24;
   const Y_AXIS_LABEL_OFFSET = 22;
@@ -216,18 +181,6 @@ function drawAxisLabels(scale) {
 
   ctx.restore();
 }
-
-xCheckboxes.forEach(checkbox => {
-  checkbox.addEventListener("change", () => {
-    if (checkbox.checked) {
-      xCheckboxes.forEach((otherCheckbox) => {
-        if (otherCheckbox !== checkbox) {
-          otherCheckbox.checked = false;
-        }
-      });
-    }
-  });
-});
 
 function drawPoint(pointX, pointY, hit) {
   ctx.beginPath();
@@ -255,11 +208,11 @@ function addResultToTable(result) {
   const hitCell = row.insertCell();
   hitCell.textContent = result.hit ? "Попадание" : "Промах";
 
-  const date = new Date(result.timestamp);
-  const formattedDate = date.toLocaleString("ru-RU");
-
   const dateCell = row.insertCell();
-  dateCell.textContent = formattedDate;
+  dateCell.textContent = new Date(result.currentTime).toLocaleString("ru-RU");
+
+  const executionCell = row.insertCell();
+  executionCell.textContent = `${(result.executionTimeNs / 1000).toFixed(1)} мкс`;
 
   for (const cell of row.cells){
     cell.classList.add("results__cell")
@@ -269,38 +222,26 @@ function addResultToTable(result) {
 }
 
 function loadResults() {
-  const savedResults = localStorage.getItem('results');
-  if (savedResults){
-    const results = JSON.parse(savedResults);
-
-    results.forEach(result => {
-      addResultToTable(result);
-    });
-  }
+  loadSavedResults().forEach(result => {
+    addResultToTable(result);
+  });
 }
 
-function drawResultPoint(result, currentR) {
+function drawResultPoint(result) {
   const pointX = xCenter + result.x * unitScale;
   const pointY = yCenter - result.y * unitScale;
 
-  const hit = checkHit(result.x, result.y, currentR);
-
-  drawPoint(pointX, pointY, hit);
+  drawPoint(pointX, pointY, result.hit);
 }
 
 function drawSavedPoints(currentR){
-  const savedPoints = localStorage.getItem('results');
-
-  if (savedPoints){
-    const results = JSON.parse(savedPoints);
-    results.forEach(result => {
-      drawResultPoint(result, currentR);
-    })
-  }
+  loadSavedResults()
+    .filter(result => Number(result.r) === currentR)
+    .forEach(drawResultPoint);
 }
 
 function clearResults() {
-  localStorage.removeItem('results');
+  localStorage.removeItem(STORAGE_KEY);
   tableBody.replaceChildren();
 
   const r = Number(selectedR.value);
@@ -340,71 +281,119 @@ function smartSelect(event) {
   selection.addRange(range);
 }
 
-form.addEventListener("submit", (event) =>{
+// Возвращает текст ошибки или null, если Y корректен
+function validateY(rawY) {
+  if (rawY === "") {
+    return "Введите Y";
+  }
+  if (rawY.length > Y_MAX_LENGTH) {
+    return `Y не длиннее ${Y_MAX_LENGTH} символов`;
+  }
+  if (!NUMBER_PATTERN.test(rawY)) {
+    return "Y должен быть числом, например -1.5";
+  }
+  const y = Number(rawY);
+  if (y <= Y_MIN || y >= Y_MAX) {
+    return `Y должен быть в интервале (${Y_MIN}; ${Y_MAX})`;
+  }
+  return null;
+}
+
+function validateR(rawR) {
+  if (rawR === "") {
+    return "Введите R"
+  }
+  if (rawR.length > 10) {
+    return `R не длиннее 10 символов`;
+  }
+  if (!NUMBER_PATTERN.test(rawR)) {
+    return "R должен быть числом, например 3.5";
+  }
+
+  const r = Number(rawR);
+  if (r <= 2 || r >= 5) {
+    return "R должен быть в интервале (2; 5)";
+  }
+
+  return null;
+}
+
+function redrawGraph() {
+  const rawR = selectedR.value.trim().replace(",", ".");
+
+  if (validateR(rawR) !== null) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
+
+  const r = Number(rawR);
+  drawGraph(r);
+  drawSavedPoints(r);
+}
+
+async function sendPoint(x, y, r) {
+  const query = new URLSearchParams({ x, y, r });
+  const response = await fetch(`${SERVER_URL}?${query}`, { method: "GET" })
+    .catch(() => {
+      throw new Error("Сервер недоступен");
+    });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = data && data.error ? data.error : `Ошибка сервера: ${response.status}`;
+    throw new Error(message);
+  }
+  if (data === null) {
+    throw new Error("Сервер вернул некорректный ответ");
+  }
+  return data;
+}
+
+form.addEventListener("submit", async (event) =>{
   event.preventDefault();
   xError.textContent = "";
   yError.textContent = "";
+  serverError.textContent = "";
+  rError.textContent = "";
 
   const selectedX = document.querySelector('input[name="x"]:checked');
   const yInput = document.querySelector('input[name="y"]');
+  const rawR = selectedR.value.trim().replace(",", ".");
+  const rErrorMessage = validateR(rawR);
+
+  if (rErrorMessage !== null) {
+    rError.textContent = rErrorMessage;
+    return;
+  }
 
   if (selectedX === null ){
     xError.textContent = "Выберите X";
     return;
   }
-  const graphX = Number(selectedX.value);
 
-  if (yInput.value.trim() === "") {
-    yError.textContent = "Выберите Y";
+  const rawY = yInput.value.trim().replace(",", ".");
+  const yErrorMessage = validateY(rawY);
+  if (yErrorMessage !== null) {
+    yError.textContent = yErrorMessage;
     return;
   }
 
-  const graphY = Number(yInput.value);
+  try {
+    const result = await sendPoint(selectedX.value, rawY, rawR);
 
-  if (Number.isNaN(graphY)){
-    yError.textContent = "Y должно быть числом";
-    return;
+    drawResultPoint(result);
+    saveResult(result);
+  } catch (error) {
+    serverError.textContent = error.message;
   }
-
-  if (graphY < -3 || graphY > 5){
-    yError.textContent = "Y должен быть в диапазоне от -3 до 5";
-    return;
-  }
-
-  const r = Number(selectedR.value);
-  const pointX = xCenter + graphX * unitScale;
-  const pointY = yCenter - graphY * unitScale;
-
-  const hit = checkHit(graphX, graphY, r);
-
-  drawPoint(pointX, pointY, hit);
-
-  const result = {
-    x: graphX,
-    y: graphY,
-    r,
-    hit,
-    timestamp: Date.now()
-  };
-
-  saveResult(result);
 });
 
-selectedR.addEventListener("change", () => {
-  const r = Number(selectedR.value);
-
-  drawGraph(r);
-  drawSavedPoints(r);
-});
+selectedR.addEventListener("input", redrawGraph);
 
 window.addEventListener("resize", resizeCanvas);
 
-canvas.addEventListener("click", clickCanvas);
-
 clearResultsButton.addEventListener("click", clearResults);
 document.addEventListener("keydown", smartSelect)
+
 resizeCanvas();
 loadResults();
-
-
-

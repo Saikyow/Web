@@ -21,10 +21,10 @@ body {
     font-family: sans-serif;
     background-color: wheat;
 }
-input[type="checkbox"]{
+input[type="radio"]{
     display: none;
 }
-input[type="checkbox"] + label {
+input[type="radio"] + label {
     display: inline-block;
     width: 36px;
     height: 36px;
@@ -34,7 +34,7 @@ input[type="checkbox"] + label {
     border-radius: 6px;
     cursor: pointer;
 }
-input[type="checkbox"]:checked + label {
+input[type="radio"]:checked + label {
     background-color: #ddd;
     font-weight: bold;
 }
@@ -69,7 +69,6 @@ canvas {
     align-items: stretch ;
 }
 .graph-panel {
-    cursor: pointer;
     flex: 2;
 }
 .form-panel {
