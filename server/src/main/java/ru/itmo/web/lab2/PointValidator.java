@@ -11,10 +11,10 @@ public final class PointValidator {
     private static final Pattern NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
     private static final int MAX_NUMBER_LENGTH = 10;
 
+    private static final BigDecimal R_MIN = dec("2");
+    private static final BigDecimal R_MAX = dec("5");
     private static final List<BigDecimal> ALLOWED_X = List.of(
             dec("-5"), dec("-4"), dec("-3"), dec("-2"), dec("-1"), dec("0"), dec("1"), dec("2"), dec("3"));
-    private static final List<BigDecimal> ALLOWED_R = List.of(
-            dec("1"), dec("1.5"), dec("2"), dec("2.5"), dec("3"));
     private static final BigDecimal Y_MIN = dec("-3");
     private static final BigDecimal Y_MAX = dec("5");
 
@@ -32,9 +32,11 @@ public final class PointValidator {
         if (y.compareTo(Y_MIN) <= 0 || y.compareTo(Y_MAX) >= 0) {
             throw new IllegalArgumentException("Y должен быть в интервале (-3; 5)");
         }
-        if (!containsValue(ALLOWED_R, r)) {
-            throw new IllegalArgumentException("R должен быть одним из значений: 1, 1.5, 2, 2.5, 3");
+        if (r.compareTo(R_MIN) <= 0 || r.compareTo(R_MAX) >= 0) {
+            throw new IllegalArgumentException(
+                    "R должен быть в интервале (2; 5)");
         }
+
         return new Point(x, y, r);
     }
 
