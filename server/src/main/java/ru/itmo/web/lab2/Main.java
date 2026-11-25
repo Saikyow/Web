@@ -7,7 +7,8 @@ public final class Main {
 
 
     public static void main(String[] args) {
-        while (new FCGIInterface().FCGIaccept() >= 0) {
+        FCGIInterface fcgi = new FCGIInterface();
+        while (fcgi.FCGIaccept() >= 0) {
             long startNanos = System.nanoTime();
             Response response = processRequest(startNanos);
             byte[] bytes = response.toBytes();
