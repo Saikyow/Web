@@ -1,29 +1,24 @@
 plugins {
     id 'java'
+    id 'war'
 }
 
 group = 'ru.itmo.web'
 version = '1.0'
 
-dependencies {
-    // Библиотека со страницы лабы, кладётся вручную в server/libs/
-    implementation files('libs/fastcgi-lib.jar')
-}
-
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    // Собираем под Java 17, чтобы jar запускался на helios
     options.release = 17
 }
 
-// Fat-jar: fastcgi-lib.jar распаковывается внутрь server.jar
-jar {
-    archiveFileName = 'server.jar'
-    manifest {
-        attributes 'Main-Class': 'ru.itmo.web.lab2.Main'
-    }
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+dependencies {
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+war {
+    archiveFileName = 'server.war'
 }
