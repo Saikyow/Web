@@ -1,8 +1,12 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="ru.itmo.web.lab2.ResultRow" %>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <link href="style.css" rel="stylesheet"/>
+  <link rel="stylesheet"
+        href="${pageContext.request.contextPath}/css/style.css">
   <title>Лабораторная работа №2</title>
 </head>
 <body>
@@ -21,7 +25,10 @@
 </div>
 
 <div class="panel form-panel">
-  <form id="pointForm" class="point-form">
+  <form id="pointForm"
+        class="point-form"
+        action="${pageContext.request.contextPath}/controller"
+        method="get">
   <div>
     <label>X:</label>
     <input type="radio" id="x-5" value="-5" name="x">
@@ -104,14 +111,32 @@
         <th class="results__heading" scope="col">Время выполнения</th>
       </tr>
       </thead>
-      <tbody></tbody>
+      <tbody>
+      <%
+        @SuppressWarnings("unchecked")
+        List<ResultRow> results = (List<ResultRow>) session.getAttribute("results");
+        if (results != null) {
+          for (ResultRow item : results) {
+      %>
+        <tr>
+          <td><%= item.x() %></td>
+          <td><%= item.y() %></td>
+          <td><%= item.r() %></td>
+          <td><%= item.hit() ? "Попадание" : "Промах" %></td>
+          <td><%= item.currentTime() %></td>
+          <td><%= item.executionTime() %></td>
+        </tr>
+      <%
+          }
+        }
+      %>
+      </tbody>
     </table>
 
   </div>
 
 </div>
 
-
-<script src="script.js"></script>
+<script src="${pageContext.request.contextPath}/js/script.js"></script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 const canvas = document.getElementById("canvas")
 const STORAGE_KEY = "lab2-504864";
-const SERVER_URL = "/fcgi-bin/server.jar";
 
 const Y_MIN = -3;
 const Y_MAX = 5;
@@ -331,26 +330,7 @@ function redrawGraph() {
   drawSavedPoints(r);
 }
 
-async function sendPoint(x, y, r) {
-  const query = new URLSearchParams({ x, y, r });
-  const response = await fetch(`${SERVER_URL}?${query}`, { method: "GET" })
-    .catch(() => {
-      throw new Error("Сервер недоступен");
-    });
-
-  const data = await response.json().catch(() => null);
-  if (!response.ok) {
-    const message = data && data.error ? data.error : `Ошибка сервера: ${response.status}`;
-    throw new Error(message);
-  }
-  if (data === null) {
-    throw new Error("Сервер вернул некорректный ответ");
-  }
-  return data;
-}
-
-form.addEventListener("submit", async (event) =>{
-  event.preventDefault();
+form.addEventListener("submit", (event) =>{
   xError.textContent = "";
   yError.textContent = "";
   serverError.textContent = "";
@@ -362,11 +342,13 @@ form.addEventListener("submit", async (event) =>{
   const rErrorMessage = validateR(rawR);
 
   if (rErrorMessage !== null) {
+    event.preventDefault();
     rError.textContent = rErrorMessage;
     return;
   }
 
   if (selectedX === null ){
+    event.preventDefault();
     xError.textContent = "Выберите X";
     return;
   }
@@ -374,18 +356,13 @@ form.addEventListener("submit", async (event) =>{
   const rawY = yInput.value.trim().replace(",", ".");
   const yErrorMessage = validateY(rawY);
   if (yErrorMessage !== null) {
+    event.preventDefault();
     yError.textContent = yErrorMessage;
     return;
   }
 
-  try {
-    const result = await sendPoint(selectedX.value, rawY, rawR);
-
-    drawResultPoint(result);
-    saveResult(result);
-  } catch (error) {
-    serverError.textContent = error.message;
-  }
+   yInput.value = rawY;
+   selectedR.value = rawR;
 });
 
 selectedR.addEventListener("input", redrawGraph);

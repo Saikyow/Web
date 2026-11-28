@@ -127,4 +127,24 @@ canvas {
 .point-form__submit:hover, .results__clear:hover {
     background-color: #ddd;
 }
+.results__table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
 
+.results__table th,
+.results__table td {
+    padding: 8px 12px;
+    text-align: center;
+    border-right: 1px solid #000;
+}
+
+.results__table th:last-child,
+.results__table td:last-child {
+    border-right: none;
+}
+
+.results__table thead tr {
+    border-bottom: 1px solid #000;
+}
